@@ -79,7 +79,7 @@ function onStart(waitSuperBingo) {
     args.cond1 = { name: getSelectListString("cond1"), value: getInputValue("cond1value") };
     args.cond2 = { name: getSelectListString("cond2"), value: getInputValue("cond2value") };
     args.cond3 = { name: getSelectListString("cond3"), value: getInputValue("cond3value") };
-    args.cond4 = { name: getSelectListString("cond4"), value: getInputValue("cond3value") };
+    args.cond4 = { name: getSelectListString("cond4"), value: getInputValue("cond4value") };
     args.slice = 127;
     args.ag = null;
 
