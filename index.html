@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>島オグメ シミュレーター</title>
+        <link rel="stylesheet" href="shimaagsim.css" />
+        <script src="mt19937ar.js"></script>
+        <script src="shimaagsim.js"></script>
+    </head>
+    <body>
+        <h1>島オグメ シミュレーター</h1>
+        <table>
+            <tr>
+                <th>装備</th>
+                <td>
+                    <select id="item" onchange="onChangeItem()">
+                        <option value="merlinic">マーリン装備</option>
+                        <option value="herculean">ヘルクリア装備</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>種類</th>
+                <td>
+                    <select id="type" onchange="onChangeType()"></select>
+                </td>
+            </tr>
+            <tr>
+                <th>石</th>
+                <td>
+                    <select id="stone" onchange="onChangeStone()">
+                        <option value="0">白魂石</option>
+                        <option value="1">緑魂石</option>
+                        <option value="2">黒魂石</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>条件1</th>
+                <td>
+                    <select id="cond1" onchange="onChangeCondition('cond1', 'cond1value', 'cond1range')"></select>
+                </td>
+                <td><input id="cond1value" type="number"/></td>
+                <td id="cond1range"></td>
+            </tr>
+            <tr>
+                <th>条件2</th>
+                <td>
+                    <select id="cond2" onchange="onChangeCondition('cond2', 'cond2value', 'cond2range')"></select>
+                </td>
+                <td><input id="cond2value" type="number" /></td>
+                <td id="cond2range"></td>
+            </tr>
+            <tr>
+                <th>条件3</th>
+                <td>
+                    <select id="cond3" onchange="onChangeCondition('cond3', 'cond3value', 'cond3range')"></select>
+                </td>
+                <td><input id="cond3value" type="number" /></td>
+                <td id="cond3range"></td>
+            </tr>
+            <tr>
+                <th>条件4</th>
+                <td>
+                    <select id="cond4" onchange="onChangeCondition('cond4', 'cond4value', 'cond4range')"></select>
+                </td>
+                <td><input id="cond4value" type="number" /></td>
+                <td id="cond4range"></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button onclick="onStart()">理想のオグメが付くまで回す</button></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>消費した石の数</th>
+                <td id="resultTimes">0</td>
+            </tr>
+        </table>
+        <div><textarea id="message" rows="4" cols="60"></textarea></div>
+        <div><a id="link" target="_blank"></a></div>
+        <ul>
+            <li>正確さは保証できません。ジョークと割り切って楽しんでください。</li>
+            <li>下記のサイトの情報を参考に作成しています。<br />
+                <a href="https://www.bg-wiki.com/bg/Category:Escha_Rewards/Arcane_Glyptics_Inscription">
+                    https://www.bg-wiki.com/bg/Category:Escha_Rewards/Arcane_Glyptics_Inscription </a>
+            </li>
+            <li>条件がある程度推測できる装備と種類のみサポートしています。</li>
+            <li>IE9では動作しません。</li>
+        </ul>
+    </body>
+</html>
