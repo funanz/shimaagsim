@@ -589,12 +589,12 @@ Merlinic.types.magic.slot5 = [
 ];
 Merlinic.types.magic.cond1 = [
     { name: "魔命+", value: 20, min: 1, max: 40 },
-    { name: "命中+", value: 20, min: 1, max: 40 },
+    { name: "命中+", value: 20, min: 1, max: 30 },
     { name: "なし", value: 0, min: 0, max: 0 },
 ];
 Merlinic.types.magic.cond2 = [
     { name: "魔攻+", value: 20, min: 1, max: 40 },
-    { name: "攻+", value: 20, min: 1, max: 40 },
+    { name: "攻+", value: 20, min: 1, max: 30 },
     { name: "なし", value: 0, min: 0, max: 0 },
 ];
 Merlinic.types.magic.cond3 =
