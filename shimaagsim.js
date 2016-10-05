@@ -24,6 +24,7 @@ THE SOFTWARE.
 var Settings = {};
 Settings.item = null;
 Settings.running = false;
+Settings.abort = false;
 
 window.onload = function () {
     onChangeItem();
@@ -68,6 +69,7 @@ function onChangeCondition(idList, idValue, idRange) {
 function onStart(waitSuperBingo) {
     if (Settings.running) return;
     Settings.running = true;
+    Settings.abort = false;
 
     clampConditionValues();
 
@@ -84,6 +86,10 @@ function onStart(waitSuperBingo) {
     args.ag = null;
 
     timerLoop(runSimulation, args, args.slice);
+}
+
+function onAbort() {
+    Settings.abort = true;
 }
 
 function setCondition(idList, idValue, idRange, conds) {
@@ -152,6 +158,14 @@ function clampConditionValue(idList, idValue, bonus) {
 }
 
 function runSimulation() {
+    if (Settings.abort) {
+        displayProgress(this);
+        displayAbortResult(this);
+
+        Settings.running = false;
+        return false;
+    }
+
     this.ag = createAG(this.type, this.stone);
 
     this.times++;
@@ -201,12 +215,42 @@ function displayResult(result) {
     displayLink("link", "Twitterに投稿", url);
 }
 
+function displayAbortResult(result) {
+    var stone = Stone.toString(result.stone);
+    var times = result.times.toLocaleString();
+    var item = result.item.displayName;
+    var cond = makeCondString(result);
+
+    var msg = stone + "を" + times + "個消費して理想の";
+    msg += item + "を諦めました。\n";
+    msg += "(条件: " + cond + ")\n";
+    msg += window.location.href;
+
+    displayTextArea("message", msg);
+
+    var url = "https://twitter.com/?status=" + encodeURIComponent(msg);
+    displayLink("link", "Twitterに投稿", url);
+}
+
 function makeAgString(ag) {
     var s = "";
     var keys = Object.keys(ag).sort();
     for (var i = 0; i < keys.length; i++)
         s += keys[i] + ag[keys[i]] + " ";
     return s;
+}
+
+function makeCondString(result) {
+    var conds = [result.cond1, result.cond2, result.cond3, result.cond4];
+
+    var list = [];
+    for (var i = 0; i < conds.length; i++) {
+        var cond = conds[i];
+        if (cond.value != 0)
+            list.push(cond.name + cond.value);
+    }
+
+    return list.join(" ");
 }
 
 function displayLink(id, text, url) {
