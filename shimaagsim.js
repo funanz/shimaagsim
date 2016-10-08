@@ -515,7 +515,7 @@ function createConditions(slots) {
         else if (slot.props && slot.props.length == 1) {
             conds.push({
                 name: slot.props[0],
-                value: Math.floor((slot.max - slot.min + 1) / 2),
+                value: Math.floor((slot.max - slot.min + 1) / 2) + slot.min - 1,
                 min: slot.min,
                 max: slot.max,
                 bonus: slot.bonus,
