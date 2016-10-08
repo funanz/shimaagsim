@@ -105,18 +105,17 @@ function setCondition(idList, idValue, idRange, conds) {
 
 function updateConditionValueRange() {
     var stone = getSelectListValue("stone");
-    var bonus3 = (stone == Stone.GREEN) ? 1 : 0;
-    var bonus4 = (stone == Stone.BLACK) ? 5 : 0;
 
-    setConditionValueRange("cond1", "cond1range", 0);
-    setConditionValueRange("cond2", "cond2range", 0);
-    setConditionValueRange("cond3", "cond3range", bonus3);
-    setConditionValueRange("cond4", "cond4range", bonus4);
+    setConditionValueRange("cond1", "cond1range", stone);
+    setConditionValueRange("cond2", "cond2range", stone);
+    setConditionValueRange("cond3", "cond3range", stone);
+    setConditionValueRange("cond4", "cond4range", stone);
 }
 
-function setConditionValueRange(idList, idRange, bonus) {
+function setConditionValueRange(idList, idRange, stone) {
     var cond = getSelectedCondition(idList);
-    var max = cond.noBonus ? cond.max : cond.max + bonus;
+    var bonus = (cond.bonus && cond.stone == stone) ? cond.bonus : 0;
+    var max = cond.max + bonus;
 
     displayString(idRange, cond.min + "-" + max);
 }
@@ -137,19 +136,18 @@ function getSelectedCondition(idList) {
 
 function clampConditionValues() {
     var stone = getSelectListValue("stone");
-    var bonus3 = (stone == Stone.GREEN) ? 1 : 0;
-    var bonus4 = (stone == Stone.BLACK) ? 5 : 0;
 
-    clampConditionValue("cond1", "cond1value", 0);
-    clampConditionValue("cond2", "cond2value", 0);
-    clampConditionValue("cond3", "cond3value", bonus3);
-    clampConditionValue("cond4", "cond4value", bonus4);
+    clampConditionValue("cond1", "cond1value", stone);
+    clampConditionValue("cond2", "cond2value", stone);
+    clampConditionValue("cond3", "cond3value", stone);
+    clampConditionValue("cond4", "cond4value", stone);
 }
 
-function clampConditionValue(idList, idValue, bonus) {
+function clampConditionValue(idList, idValue, stone) {
     var cond = getSelectedCondition(idList);
+    var bonus = (cond.bonus && cond.stone == stone) ? cond.bonus : 0;
+    var max = cond.max + bonus;
 
-    var max = cond.noBonus ? cond.max : cond.max + bonus;
     var value = getInputValue(idValue);
     if (value < cond.min) value = cond.min;
     if (value > max) value = max;
@@ -185,7 +183,7 @@ function runSimulation() {
 }
 
 function checkCondition(ag, cond) {
-    if (cond.name == "なし") return true;
+    if (cond.value == 0) return true;
 
     var value = ag[cond.name];
     if (isNaN(value))
@@ -470,20 +468,18 @@ function addPropValue(ag, slot, value) {
     }
 }
 
-function addProp(ag, slot, bonus) {
+function addProp(ag, slot, stone) {
     if (!slot.props) return;
 
-    if (slot.noBonus)
-        bonus = 0;
+    var bonus = (slot.bonus && slot.stone == stone) ? slot.bonus : 0;
     var value = randomValueFlat(slot.min, slot.max + bonus);
     addPropValue(ag, slot, value);
 }
 
-function addPropSlope(ag, slot, bonus) {
+function addPropSlope(ag, slot, stone) {
     if (!slot.props) return;
 
-    if (slot.noBonus)
-        bonus = 0;
+    var bonus = (slot.bonus && slot.stone == stone) ? slot.bonus : 0;
     var value = randomValueSlope(slot.min, slot.max + bonus, 3, 100);
     addPropValue(ag, slot, value);
 }
@@ -492,22 +488,22 @@ function createAG(type, stone) {
     var ag = {};
 
     if (stone == Stone.WHITE)
-        addProp(ag, randomChoice(type.slot1f), 0);
+        addProp(ag, randomChoice(type.slot1f), stone);
     else
-        addProp(ag, randomChoice(type.slot1), 0);
+        addProp(ag, randomChoice(type.slot1), stone);
 
     if (stone == Stone.GREEN)
-        addPropSlope(ag, randomChoice(type.slot2f), 1);
+        addPropSlope(ag, randomChoice(type.slot2f), stone);
     else
-        addPropSlope(ag, randomChoice(type.slot2), 0);
+        addPropSlope(ag, randomChoice(type.slot2), stone);
 
     if (stone == Stone.BLACK)
-        addProp(ag, randomChoice(type.slot3f), 5);
+        addProp(ag, randomChoice(type.slot3f), stone);
     else
-        addProp(ag, randomChoice(type.slot3), 0);
+        addProp(ag, randomChoice(type.slot3), stone);
 
-    addProp(ag, randomChoice(type.slot4), 0);
-    addProp(ag, randomChoice(type.slot5), 0);
+    addProp(ag, randomChoice(type.slot4), stone);
+    addProp(ag, randomChoice(type.slot5), stone);
 
     return ag;
 }
@@ -524,7 +520,8 @@ function createConditions(slots) {
                 value: Math.floor((slot.max - slot.min + 1) / 2),
                 min: slot.min,
                 max: slot.max,
-                noBonus: slot.noBonus
+                bonus: slot.bonus,
+                stone: slot.stone
             });
         }
     }
@@ -534,7 +531,7 @@ function createConditions(slots) {
 
 function createConditionsWithNone(slots) {
     var conds = createConditions(slots);
-    conds.push({ name: "なし", value: 0, min: 0, max: 0, noBonus: true });
+    conds.push({ name: "なし", value: 0, min: 0, max: 0 });
     return conds;
 }
 
@@ -580,21 +577,21 @@ Merlinic.types.magic.slot1 = [
 Merlinic.types.magic.slot2f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 10 },
-            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10 },
-            { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15 },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6 },
-            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 10 },
-            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10 },
-            { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10 },
-            { weight: 1, props: ["敵対心-"], min: 1, max: 6 },
+            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
         ]
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, noBonus: true },
-            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, noBonus: true },
-            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, noBonus: true },
+            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
+            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
+            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
         ]
     },
 ];
@@ -605,17 +602,17 @@ Merlinic.types.magic.slot2 = [
 Merlinic.types.magic.slot3f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["INT+"], min: 1, max: 10 },
-            { weight: 1, props: ["MND+"], min: 1, max: 10 },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10 },
+            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 10 },
-            { weight: 1, props: ["DEX+"], min: 1, max: 10 },
-            { weight: 1, props: ["VIT+"], min: 1, max: 10 },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10 },
+            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
 ];
@@ -676,22 +673,22 @@ Herculean.types.melee.slot1 = [
 Herculean.types.melee.slot2f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3 },
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4 },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4 },
-            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4 },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 6 },
-            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4 },
-            { weight: 1, props: ["二刀流+"], min: 1, max: 5 },
-            { weight: 1, props: ["ワルツ回復量+"], min: 1, max: 10 },
-            { weight: 1, props: ["カウンター+"], min: 1, max: 4 },
+            { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["二刀流+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ワルツ回復量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["カウンター+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
         ]
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, noBonus: true },
-            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, noBonus: true },
-            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, noBonus: true },
+            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
+            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
+            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
         ]
     },
 ];
@@ -702,17 +699,17 @@ Herculean.types.melee.slot2 = [
 Herculean.types.melee.slot3f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 10 },
-            { weight: 1, props: ["DEX+"], min: 1, max: 10 },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10 },
+            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["VIT+"], min: 1, max: 10 },
-            { weight: 1, props: ["INT+"], min: 1, max: 10 },
-            { weight: 1, props: ["MND+"], min: 1, max: 10 },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10 },
+            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
 ];
@@ -770,21 +767,21 @@ Herculean.types.magic.slot1 = [
 Herculean.types.magic.slot2f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 7 },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 5 },
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4 },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4 },
-            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4 },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 6 },
-            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4 },
-            { weight: 1, props: ["敵対心-"], min: 1, max: 6 },
+            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
         ]
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, noBonus: true },
-            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, noBonus: true },
-            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, noBonus: true },
+            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
+            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
+            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
         ]
     },
 ];
@@ -795,17 +792,17 @@ Herculean.types.magic.slot2 = [
 Herculean.types.magic.slot3f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["INT+"], min: 1, max: 10 },
-            { weight: 1, props: ["MND+"], min: 1, max: 10 },
-            { weight: 1, props: ["STR+"], min: 1, max: 10 },
+            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["DEX+"], min: 1, max: 10 },
-            { weight: 1, props: ["VIT+"], min: 1, max: 10 },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10 },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10 },
+            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
 ];
