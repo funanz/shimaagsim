@@ -472,15 +472,13 @@ function addProp(ag, slot, stone) {
     if (!slot.props) return;
 
     var bonus = (slot.bonus && slot.stone == stone) ? slot.bonus : 0;
-    var value = randomValueFlat(slot.min, slot.max + bonus);
-    addPropValue(ag, slot, value);
-}
 
-function addPropSlope(ag, slot, stone) {
-    if (!slot.props) return;
+    var value;
+    if (slot.dist == "slope")
+        value = randomValueSlope(slot.min, slot.max + bonus, 3, 100);
+    else
+        value = randomValueFlat(slot.min, slot.max + bonus);
 
-    var bonus = (slot.bonus && slot.stone == stone) ? slot.bonus : 0;
-    var value = randomValueSlope(slot.min, slot.max + bonus, 3, 100);
     addPropValue(ag, slot, value);
 }
 
@@ -493,9 +491,9 @@ function createAG(type, stone) {
         addProp(ag, randomChoice(type.slot1), stone);
 
     if (stone == Stone.GREEN)
-        addPropSlope(ag, randomChoice(type.slot2f), stone);
+        addProp(ag, randomChoice(type.slot2f), stone);
     else
-        addPropSlope(ag, randomChoice(type.slot2), stone);
+        addProp(ag, randomChoice(type.slot2), stone);
 
     if (stone == Stone.BLACK)
         addProp(ag, randomChoice(type.slot3f), stone);
@@ -577,14 +575,14 @@ Merlinic.types.magic.slot1 = [
 Merlinic.types.magic.slot2f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
         ]
     },
     {
@@ -673,15 +671,15 @@ Herculean.types.melee.slot1 = [
 Herculean.types.melee.slot2f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["二刀流+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ワルツ回復量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["カウンター+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["二刀流+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ワルツ回復量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["カウンター+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
         ]
     },
     {
@@ -767,14 +765,14 @@ Herculean.types.magic.slot1 = [
 Herculean.types.magic.slot2f = [
     {
         weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN },
-            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN },
+            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
         ]
     },
     {
