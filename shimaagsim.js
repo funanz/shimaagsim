@@ -907,10 +907,10 @@ Grioavolr.types.magic.slot2f = [
     },
     {
         weight: 10, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["STR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["DEX+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["VIT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["AGI+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
         ]
     },
 ];
@@ -983,9 +983,9 @@ Colada.types.magic.slot2f = [
     {
         weight: 10, random: [
             { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["INT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MND+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["CHR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
         ]
     },
 ];
