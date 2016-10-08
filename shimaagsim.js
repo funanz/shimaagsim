@@ -51,6 +51,7 @@ function onChangeType() {
     setCondition("cond2", "cond2value", "cond2range", type.cond2);
     setCondition("cond3", "cond3value", "cond3range", type.cond3);
     setCondition("cond4", "cond4value", "cond4range", type.cond4);
+    setCondition("cond5", "cond5value", "cond5range", type.cond5);
 
     updateConditionValueRange();
 }
@@ -82,6 +83,7 @@ function onStart(waitSuperBingo) {
     args.cond2 = { name: getSelectListString("cond2"), value: getInputValue("cond2value") };
     args.cond3 = { name: getSelectListString("cond3"), value: getInputValue("cond3value") };
     args.cond4 = { name: getSelectListString("cond4"), value: getInputValue("cond4value") };
+    args.cond5 = { name: getSelectListString("cond5"), value: getInputValue("cond5value") };
     args.slice = getSelectListValue("slice");
     args.ag = null;
 
@@ -110,6 +112,7 @@ function updateConditionValueRange() {
     setConditionValueRange("cond2", "cond2range", stone);
     setConditionValueRange("cond3", "cond3range", stone);
     setConditionValueRange("cond4", "cond4range", stone);
+    setConditionValueRange("cond5", "cond5range", stone);
 }
 
 function setConditionValueRange(idList, idRange, stone) {
@@ -141,6 +144,7 @@ function clampConditionValues() {
     clampConditionValue("cond2", "cond2value", stone);
     clampConditionValue("cond3", "cond3value", stone);
     clampConditionValue("cond4", "cond4value", stone);
+    clampConditionValue("cond5", "cond5value", stone);
 }
 
 function clampConditionValue(idList, idValue, stone) {
@@ -174,6 +178,7 @@ function runSimulation() {
     if (!checkCondition(this.ag, this.cond2)) return true;
     if (!checkCondition(this.ag, this.cond3)) return true;
     if (!checkCondition(this.ag, this.cond4)) return true;
+    if (!checkCondition(this.ag, this.cond5)) return true;
 
     displayProgress(this);
     displayResult(this);
@@ -231,15 +236,15 @@ function displayAbortResult(result) {
 }
 
 function makeAgString(ag) {
-    var s = "";
+    var list = [];
     var keys = Object.keys(ag).sort();
     for (var i = 0; i < keys.length; i++)
-        s += keys[i] + ag[keys[i]] + " ";
-    return s;
+        list.push(keys[i] + ag[keys[i]]);
+    return list.join(" ");
 }
 
 function makeCondString(result) {
-    var conds = [result.cond1, result.cond2, result.cond3, result.cond4];
+    var conds = [result.cond1, result.cond2, result.cond3, result.cond4, result.cond5];
 
     var list = [];
     for (var i = 0; i < conds.length; i++) {
@@ -248,7 +253,7 @@ function makeCondString(result) {
             list.push(cond.name + cond.value);
     }
 
-    return list.join(" ");
+    return list.join(" ").trim();
 }
 
 function displayLink(id, text, url) {
@@ -483,6 +488,15 @@ function addProp(ag, slot, stone) {
 }
 
 function createAG(type, stone) {
+    switch (type.type) {
+        case "armor":
+            return createArmorAG(type, stone);
+        case "weapon":
+            return createWearponAG(type, stone);
+    }
+}
+
+function createArmorAG(type, stone) {
     var ag = {};
 
     if (stone == Stone.WHITE)
@@ -500,6 +514,26 @@ function createAG(type, stone) {
     else
         addProp(ag, randomChoice(type.slot3), stone);
 
+    addProp(ag, randomChoice(type.slot4), stone);
+    addProp(ag, randomChoice(type.slot5), stone);
+
+    return ag;
+}
+
+function createWearponAG(type, stone) {
+    var ag = {};
+
+    if (stone == Stone.GREEN)
+        addProp(ag, randomChoice(type.slot1f), stone);
+    else
+        addProp(ag, randomChoice(type.slot1), stone);
+
+    if (stone == Stone.BLACK)
+        addProp(ag, randomChoice(type.slot2f), stone);
+    else
+        addProp(ag, randomChoice(type.slot2), stone);
+
+    addProp(ag, randomChoice(type.slot3), stone);
     addProp(ag, randomChoice(type.slot4), stone);
     addProp(ag, randomChoice(type.slot5), stone);
 
@@ -551,6 +585,7 @@ Merlinic.displayName = "マーリン装備";
 Merlinic.types = {};
 Merlinic.types.magic = {};
 Merlinic.types.magic.displayName = "魔法";
+Merlinic.types.magic.type = "armor";
 Merlinic.types.magic.sortOrder = 1;
 Merlinic.types.magic.slot1f = [
     {
@@ -640,6 +675,8 @@ Merlinic.types.magic.cond3 =
     createConditionsWithNone(Merlinic.types.magic.slot2);
 Merlinic.types.magic.cond4 =
     createConditionsWithNone(Merlinic.types.magic.slot3);
+Merlinic.types.magic.cond5 =
+    [{ name: "なし", value: 0, min: 0, max: 0 }];
 
 var Herculean = {};
 Herculean.displayName = "ヘルクリア装備";
@@ -647,6 +684,7 @@ Herculean.types = {};
 
 Herculean.types.melee = {};
 Herculean.types.melee.displayName = "近接";
+Herculean.types.melee.type = "armor";
 Herculean.types.melee.sortOrder = 1;
 Herculean.types.melee.slot1f = [
     {
@@ -737,10 +775,12 @@ Herculean.types.melee.cond3 =
     createConditionsWithNone(Herculean.types.melee.slot2);
 Herculean.types.melee.cond4 =
     createConditionsWithNone(Herculean.types.melee.slot3);
-
+Herculean.types.melee.cond5 =
+    [{ name: "なし", value: 0, min: 0, max: 0 }];
 
 Herculean.types.magic = {};
 Herculean.types.magic.displayName = "魔法";
+Herculean.types.magic.type = "armor";
 Herculean.types.magic.sortOrder = 3;
 Herculean.types.magic.slot1f = [
     {
@@ -830,7 +870,154 @@ Herculean.types.magic.cond3 =
     createConditionsWithNone(Herculean.types.magic.slot2);
 Herculean.types.magic.cond4 =
     createConditionsWithNone(Herculean.types.magic.slot3);
+Herculean.types.magic.cond5 =
+    [{ name: "なし", value: 0, min: 0, max: 0 }];
+
+var Grioavolr = {};
+Grioavolr.displayName = "グリオアヴァール";
+Grioavolr.types = {};
+
+Grioavolr.types.magic = {};
+Grioavolr.types.magic.displayName = "魔法";
+Grioavolr.types.magic.type = "weapon";
+Grioavolr.types.magic.sortOrder = 1;
+Grioavolr.types.magic.slot1f = [
+    { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 8, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["強化魔法時間+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["弱体魔法スキル+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["詠唱中断率-"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["コンサーブMP+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+];
+Grioavolr.types.magic.slot1 = [
+    { weight: 60, random: Grioavolr.types.magic.slot1f },
+    { weight: 40 },
+];
+Grioavolr.types.magic.slot2f = [
+    {
+        weight: 90, random: [
+            { weight: 1, props: ["INT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MND+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["CHR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MP+"], min: 1, max: 100, bonus: 20, stone: Stone.BLACK },
+        ]
+    },
+    {
+        weight: 10, random: [
+            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+        ]
+    },
+];
+Grioavolr.types.magic.slot2 = [
+    { weight: 60, random: Grioavolr.types.magic.slot2f },
+    { weight: 40 },
+];
+Grioavolr.types.magic.slot3 = [
+    { weight: 60, props: ["魔命+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+    { weight: 40 },
+];
+Grioavolr.types.magic.slot4 = [
+    { weight: 60, props: ["魔攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+    { weight: 40 },
+];
+Grioavolr.types.magic.slot5 = [
+    { weight: 60, props: ["魔法ダメージ+"], min: 1, max: 10 },
+    { weight: 40 },
+];
+Grioavolr.types.magic.cond1 =
+    createConditionsWithNone(Grioavolr.types.magic.slot3);
+Grioavolr.types.magic.cond2 =
+    createConditionsWithNone(Grioavolr.types.magic.slot4);
+Grioavolr.types.magic.cond3 =
+    createConditionsWithNone(Grioavolr.types.magic.slot1);
+Grioavolr.types.magic.cond4 =
+    createConditionsWithNone(Grioavolr.types.magic.slot2);
+Grioavolr.types.magic.cond5 =
+    createConditionsWithNone(Grioavolr.types.magic.slot5);
+
+var Colada = {};
+Colada.displayName = "コラーダ";
+Colada.types = {};
+
+Colada.types.magic = {};
+Colada.types.magic.displayName = "近接";
+Colada.types.magic.type = "weapon";
+Colada.types.magic.sortOrder = 1;
+Colada.types.magic.slot1f = [
+    {
+        weight: 90, random: [
+            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ウェポンスキルのダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ストアTP+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["魔命+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["魔攻+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["敵対心+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ヘイスト+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+        ]
+    },
+    {
+        weight: 10, random: [
+            { weight: 1, props: ["被物理ダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+        ]
+    },
+];
+Colada.types.magic.slot1 = [
+    { weight: 60, random: Colada.types.magic.slot1f },
+    { weight: 40 },
+];
+Colada.types.magic.slot2f = [
+    {
+        weight: 90, random: [
+            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+        ]
+    },
+    {
+        weight: 10, random: [
+            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["INT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["MND+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            { weight: 1, props: ["CHR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+        ]
+    },
+];
+Colada.types.magic.slot2 = [
+    { weight: 60, random: Colada.types.magic.slot2f },
+    { weight: 40 },
+];
+Colada.types.magic.slot3 = [
+    { weight: 60, props: ["命中+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+    { weight: 40 },
+];
+Colada.types.magic.slot4 = [
+    { weight: 60, props: ["攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+    { weight: 40 },
+];
+Colada.types.magic.slot5 = [
+    { weight: 60, props: ["D+"], min: 1, max: 20 },
+    { weight: 40 },
+];
+Colada.types.magic.cond1 =
+    createConditionsWithNone(Colada.types.magic.slot3);
+Colada.types.magic.cond2 =
+    createConditionsWithNone(Colada.types.magic.slot4);
+Colada.types.magic.cond3 =
+    createConditionsWithNone(Colada.types.magic.slot1);
+Colada.types.magic.cond4 =
+    createConditionsWithNone(Colada.types.magic.slot2);
+Colada.types.magic.cond5 =
+    createConditionsWithNone(Colada.types.magic.slot5);
 
 var Items = {};
 Items.merlinic = Merlinic;
 Items.herculean = Herculean;
+Items.grioavolr = Grioavolr;
+Items.colada = Colada;

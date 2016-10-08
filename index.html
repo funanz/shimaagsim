@@ -16,6 +16,8 @@
                     <select id="item" onchange="onChangeItem()">
                         <option value="merlinic">マーリン装備</option>
                         <option value="herculean">ヘルクリア装備</option>
+                        <option value="grioavolr">グリオアヴァール（仮）</option>
+                        <option value="colada">コラーダ（仮）</option>
                     </select>
                 </td>
             </tr>
@@ -66,6 +68,14 @@
                 </td>
                 <td><input id="cond4value" type="number" /></td>
                 <td id="cond4range"></td>
+            </tr>
+            <tr>
+                <th>条件5</th>
+                <td>
+                    <select id="cond5" onchange="onChangeCondition('cond5', 'cond5value', 'cond5range')"></select>
+                </td>
+                <td><input id="cond5value" type="number" /></td>
+                <td id="cond5range"></td>
             </tr>
             <tr>
                 <th>処理数</th>
