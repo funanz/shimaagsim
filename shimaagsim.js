@@ -945,11 +945,11 @@ var Colada = {};
 Colada.displayName = "コラーダ";
 Colada.types = {};
 
-Colada.types.magic = {};
-Colada.types.magic.displayName = "近接";
-Colada.types.magic.type = "weapon";
-Colada.types.magic.sortOrder = 1;
-Colada.types.magic.slot1f = [
+Colada.types.melee = {};
+Colada.types.melee.displayName = "近接";
+Colada.types.melee.type = "weapon";
+Colada.types.melee.sortOrder = 1;
+Colada.types.melee.slot1f = [
     {
         weight: 90, random: [
             { weight: 1, props: ["ダブルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
@@ -968,11 +968,11 @@ Colada.types.magic.slot1f = [
         ]
     },
 ];
-Colada.types.magic.slot1 = [
-    { weight: 60, random: Colada.types.magic.slot1f },
+Colada.types.melee.slot1 = [
+    { weight: 60, random: Colada.types.melee.slot1f },
     { weight: 40 },
 ];
-Colada.types.magic.slot2f = [
+Colada.types.melee.slot2f = [
     {
         weight: 90, random: [
             { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
@@ -989,32 +989,32 @@ Colada.types.magic.slot2f = [
         ]
     },
 ];
-Colada.types.magic.slot2 = [
-    { weight: 60, random: Colada.types.magic.slot2f },
+Colada.types.melee.slot2 = [
+    { weight: 60, random: Colada.types.melee.slot2f },
     { weight: 40 },
 ];
-Colada.types.magic.slot3 = [
+Colada.types.melee.slot3 = [
     { weight: 60, props: ["命中+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
     { weight: 40 },
 ];
-Colada.types.magic.slot4 = [
+Colada.types.melee.slot4 = [
     { weight: 60, props: ["攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
     { weight: 40 },
 ];
-Colada.types.magic.slot5 = [
+Colada.types.melee.slot5 = [
     { weight: 60, props: ["D+"], min: 1, max: 20 },
     { weight: 40 },
 ];
-Colada.types.magic.cond1 =
-    createConditionsWithNone(Colada.types.magic.slot3);
-Colada.types.magic.cond2 =
-    createConditionsWithNone(Colada.types.magic.slot4);
-Colada.types.magic.cond3 =
-    createConditionsWithNone(Colada.types.magic.slot1);
-Colada.types.magic.cond4 =
-    createConditionsWithNone(Colada.types.magic.slot2);
-Colada.types.magic.cond5 =
-    createConditionsWithNone(Colada.types.magic.slot5);
+Colada.types.melee.cond1 =
+    createConditionsWithNone(Colada.types.melee.slot3);
+Colada.types.melee.cond2 =
+    createConditionsWithNone(Colada.types.melee.slot4);
+Colada.types.melee.cond3 =
+    createConditionsWithNone(Colada.types.melee.slot1);
+Colada.types.melee.cond4 =
+    createConditionsWithNone(Colada.types.melee.slot2);
+Colada.types.melee.cond5 =
+    createConditionsWithNone(Colada.types.melee.slot5);
 
 var Items = {};
 Items.merlinic = Merlinic;
