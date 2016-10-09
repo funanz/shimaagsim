@@ -614,7 +614,7 @@ Merlinic.types.magic.slot2f = [
             { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
