@@ -888,7 +888,7 @@ Grioavolr.types.magic.slot1f = [
     { weight: 1, props: ["弱体魔法スキル+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
     { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
     { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["詠唱中断率-"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    { weight: 1, props: ["詠唱中断率-"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
     { weight: 1, props: ["コンサーブMP+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
     { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
 ];
