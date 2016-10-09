@@ -902,7 +902,7 @@ Grioavolr.types.magic.slot2f = [
             { weight: 1, props: ["INT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
             { weight: 1, props: ["MND+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
             { weight: 1, props: ["CHR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MP+"], min: 1, max: 100, bonus: 20, stone: Stone.BLACK },
+            { weight: 1, props: ["MP+"], min: 1, max: 110, bonus: 10, stone: Stone.BLACK },
         ]
     },
     {
