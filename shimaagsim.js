@@ -43,11 +43,11 @@ function onChangeItem() {
 function onChangeType() {
     var type = getSelectedType();
 
-    setCondition("cond1", "cond1value", "cond1range", type.cond1);
-    setCondition("cond2", "cond2value", "cond2range", type.cond2);
-    setCondition("cond3", "cond3value", "cond3range", type.cond3);
-    setCondition("cond4", "cond4value", "cond4range", type.cond4);
-    setCondition("cond5", "cond5value", "cond5range", type.cond5);
+    setCondition(1, type.cond1);
+    setCondition(2, type.cond2);
+    setCondition(3, type.cond3);
+    setCondition(4, type.cond4);
+    setCondition(5, type.cond5);
 
     updateConditionValueRange();
 }
@@ -56,9 +56,10 @@ function onChangeStone() {
     updateConditionValueRange();
 }
 
-function onChangeCondition(idList, idValue, idRange) {
-    var cond = getSelectedCondition(idList);
-    setInputString(idValue, cond.value);
+function onChangeCondition(index) {
+    var id = getConditionId(index);
+    var cond = getSelectedCondition(index);
+    setInputString(id.value, cond.value);
 
     updateConditionValueRange();
 }
@@ -75,11 +76,11 @@ function onStart(waitSuperBingo) {
     args.item = getSelectedItem();
     args.type = getSelectedType();
     args.stone = getSelectedStone();
-    args.cond1 = getSelectedConditionValue("cond1", "cond1value");
-    args.cond2 = getSelectedConditionValue("cond2", "cond2value");
-    args.cond3 = getSelectedConditionValue("cond3", "cond3value");
-    args.cond4 = getSelectedConditionValue("cond4", "cond4value");
-    args.cond5 = getSelectedConditionValue("cond5", "cond5value");
+    args.cond1 = getSelectedConditionValue(1);
+    args.cond2 = getSelectedConditionValue(2);
+    args.cond3 = getSelectedConditionValue(3);
+    args.cond4 = getSelectedConditionValue(4);
+    args.cond5 = getSelectedConditionValue(5);
     args.slice = getSelectListValue("slice");
     args.ag = null;
 
@@ -90,15 +91,25 @@ function onAbort() {
     Settings.abort = true;
 }
 
-function setCondition(idList, idValue, idRange, conds) {
+function getConditionId(index) {
+    return {
+        list: "cond" + index,
+        value: "cond" + index + "value",
+        range: "cond" + index + "range",
+    };
+}
+
+function setCondition(index, conds) {
+    var id = getConditionId(index);
+
     var list = [];
     for (var i = 0; i < conds.length; i++) {
         var cond = conds[i];
         list.push({ value: cond.name, text: cond.name });
     }
-    setSelectList(idList, list);
+    setSelectList(id.list, list);
 
-    setInputString(idValue, conds[0].value);
+    setInputString(id.value, conds[0].value);
 }
 
 function getSelectedItem() {
@@ -119,25 +130,27 @@ function getSelectedStone() {
 function updateConditionValueRange() {
     var stone = getSelectListValue("stone");
 
-    setConditionValueRange("cond1", "cond1range", stone);
-    setConditionValueRange("cond2", "cond2range", stone);
-    setConditionValueRange("cond3", "cond3range", stone);
-    setConditionValueRange("cond4", "cond4range", stone);
-    setConditionValueRange("cond5", "cond5range", stone);
+    setConditionValueRange(1, stone);
+    setConditionValueRange(2, stone);
+    setConditionValueRange(3, stone);
+    setConditionValueRange(4, stone);
+    setConditionValueRange(5, stone);
 }
 
-function setConditionValueRange(idList, idRange, stone) {
-    var cond = getSelectedCondition(idList);
+function setConditionValueRange(index, stone) {
+    var id = getConditionId(index);
+    var cond = getSelectedCondition(index);
     var bonus = (cond.bonus && cond.stone == stone) ? cond.bonus : 0;
     var max = cond.max + bonus;
 
-    displayString(idRange, cond.min + "-" + max);
+    displayString(id.range, cond.min + "-" + max);
 }
 
-function getSelectedCondition(idList) {
+function getSelectedCondition(index) {
+    var id = getConditionId(index);
     var type = getSelectedType();
-    var conds = type[idList];
-    var condName = getSelectListString(idList);
+    var conds = type[id.list];
+    var condName = getSelectListString(id.list);
 
     for (var i = 0; i < conds.length; i++) {
         if (conds[i].name == condName)
@@ -147,33 +160,35 @@ function getSelectedCondition(idList) {
     return null;
 }
 
-function getSelectedConditionValue(idList, idValue) {
+function getSelectedConditionValue(index) {
+    var id = getConditionId(index);
     return {
-        name: getSelectListString(idList),
-        value: getInputValue(idValue),
+        name: getSelectListString(id.list),
+        value: getInputValue(id.value),
     };
 }
 
 function clampConditionValues() {
     var stone = getSelectListValue("stone");
 
-    clampConditionValue("cond1", "cond1value", stone);
-    clampConditionValue("cond2", "cond2value", stone);
-    clampConditionValue("cond3", "cond3value", stone);
-    clampConditionValue("cond4", "cond4value", stone);
-    clampConditionValue("cond5", "cond5value", stone);
+    clampConditionValue(1, stone);
+    clampConditionValue(2, stone);
+    clampConditionValue(3, stone);
+    clampConditionValue(4, stone);
+    clampConditionValue(5, stone);
 }
 
-function clampConditionValue(idList, idValue, stone) {
-    var cond = getSelectedCondition(idList);
+function clampConditionValue(index, stone) {
+    var id = getConditionId(index);
+    var cond = getSelectedCondition(index);
     var bonus = (cond.bonus && cond.stone == stone) ? cond.bonus : 0;
     var max = cond.max + bonus;
 
-    var value = getInputValue(idValue);
+    var value = getInputValue(id.value);
     if (value < cond.min) value = cond.min;
     if (value > max) value = max;
 
-    setInputString(idValue, value);
+    setInputString(id.value, value);
 }
 
 function runSimulation() {
