@@ -76,7 +76,7 @@ function onChangeCondition(index) {
     updateConditionValueRange();
 }
 
-function onStart(waitSuperBingo) {
+function onStart() {
     if (Settings.running) return;
     Settings.running = true;
     Settings.abort = false;
