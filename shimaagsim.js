@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 var Settings = {};
-Settings.item = null;
 Settings.running = false;
 Settings.abort = false;
 
@@ -31,9 +30,7 @@ window.onload = function () {
 }
 
 function onChangeItem() {
-    var name = getSelectListString("item");
-    var item = Items[name];
-    Settings.item = item;
+    var item = getSelectedItem();
 
     var list = [];
     for (var name in item.types)
@@ -44,8 +41,7 @@ function onChangeItem() {
 }
 
 function onChangeType() {
-    var name = getSelectListString("type");
-    var type = Settings.item.types[name];
+    var type = getSelectedType();
 
     setCondition("cond1", "cond1value", "cond1range", type.cond1);
     setCondition("cond2", "cond2value", "cond2range", type.cond2);
@@ -76,14 +72,14 @@ function onStart(waitSuperBingo) {
 
     var args = {};
     args.times = 0;
-    args.item = Settings.item;
-    args.type = Settings.item.types[getSelectListString("type")];
-    args.stone = getInputValue("stone");
-    args.cond1 = { name: getSelectListString("cond1"), value: getInputValue("cond1value") };
-    args.cond2 = { name: getSelectListString("cond2"), value: getInputValue("cond2value") };
-    args.cond3 = { name: getSelectListString("cond3"), value: getInputValue("cond3value") };
-    args.cond4 = { name: getSelectListString("cond4"), value: getInputValue("cond4value") };
-    args.cond5 = { name: getSelectListString("cond5"), value: getInputValue("cond5value") };
+    args.item = getSelectedItem();
+    args.type = getSelectedType();
+    args.stone = getSelectedStone();
+    args.cond1 = getSelectedConditionValue("cond1", "cond1value");
+    args.cond2 = getSelectedConditionValue("cond2", "cond2value");
+    args.cond3 = getSelectedConditionValue("cond3", "cond3value");
+    args.cond4 = getSelectedConditionValue("cond4", "cond4value");
+    args.cond5 = getSelectedConditionValue("cond5", "cond5value");
     args.slice = getSelectListValue("slice");
     args.ag = null;
 
@@ -105,6 +101,21 @@ function setCondition(idList, idValue, idRange, conds) {
     setInputString(idValue, conds[0].value);
 }
 
+function getSelectedItem() {
+    var name = getSelectListString("item");
+    return Items[name];
+}
+
+function getSelectedType() {
+    var item = getSelectedItem();
+    var name = getSelectListString("type");
+    return item.types[name];
+}
+
+function getSelectedStone() {
+    return getSelectListValue("stone");
+}
+
 function updateConditionValueRange() {
     var stone = getSelectListValue("stone");
 
@@ -124,8 +135,7 @@ function setConditionValueRange(idList, idRange, stone) {
 }
 
 function getSelectedCondition(idList) {
-    var typeName = getSelectListString("type");
-    var type = Settings.item.types[typeName];
+    var type = getSelectedType();
     var conds = type[idList];
     var condName = getSelectListString(idList);
 
@@ -135,6 +145,13 @@ function getSelectedCondition(idList) {
     }
 
     return null;
+}
+
+function getSelectedConditionValue(idList, idValue) {
+    return {
+        name: getSelectListString(idList),
+        value: getInputValue(idValue),
+    };
 }
 
 function clampConditionValues() {
