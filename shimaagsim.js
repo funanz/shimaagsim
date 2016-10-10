@@ -882,15 +882,23 @@ Grioavolr.types.magic.displayName = "魔法";
 Grioavolr.types.magic.type = "weapon";
 Grioavolr.types.magic.sortOrder = 1;
 Grioavolr.types.magic.slot1f = [
-    { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 8, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["強化魔法時間+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["弱体魔法スキル+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["詠唱中断率-"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["コンサーブMP+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-    { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+    {
+        weight: 90, random: [
+            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 8, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["強化魔法時間+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["弱体魔法スキル+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["詠唱中断率-"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+        ]
+    },
+    {
+        weight: 10, random: [
+            { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+        ]
+    },
 ];
 Grioavolr.types.magic.slot1 = [
     { weight: 60, random: Grioavolr.types.magic.slot1f },
