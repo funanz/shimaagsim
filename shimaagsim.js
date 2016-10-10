@@ -630,7 +630,6 @@ Merlinic.types = {};
 Merlinic.types.magic = {};
 Merlinic.types.magic.displayName = "魔法";
 Merlinic.types.magic.type = "armor";
-Merlinic.types.magic.sortOrder = 1;
 Merlinic.types.magic.slot1f = [
     {
         weight: 90, random: [
@@ -729,7 +728,6 @@ Herculean.types = {};
 Herculean.types.melee = {};
 Herculean.types.melee.displayName = "近接";
 Herculean.types.melee.type = "armor";
-Herculean.types.melee.sortOrder = 1;
 Herculean.types.melee.slot1f = [
     {
         weight: 90, random: [
@@ -825,7 +823,6 @@ Herculean.types.melee.cond5 =
 Herculean.types.magic = {};
 Herculean.types.magic.displayName = "魔法";
 Herculean.types.magic.type = "armor";
-Herculean.types.magic.sortOrder = 3;
 Herculean.types.magic.slot1f = [
     {
         weight: 90, random: [
@@ -925,7 +922,6 @@ Grioavolr.types = {};
 Grioavolr.types.magic = {};
 Grioavolr.types.magic.displayName = "魔法";
 Grioavolr.types.magic.type = "weapon";
-Grioavolr.types.magic.sortOrder = 1;
 Grioavolr.types.magic.slot1f = [
     {
         weight: 90, random: [
@@ -1002,7 +998,6 @@ Colada.types = {};
 Colada.types.melee = {};
 Colada.types.melee.displayName = "近接";
 Colada.types.melee.type = "weapon";
-Colada.types.melee.sortOrder = 1;
 Colada.types.melee.slot1f = [
     {
         weight: 90, random: [
