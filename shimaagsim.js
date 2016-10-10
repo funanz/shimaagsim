@@ -128,7 +128,7 @@ function getSelectedStone() {
 }
 
 function updateConditionValueRange() {
-    var stone = getSelectListValue("stone");
+    var stone = getSelectedStone();
 
     setConditionValueRange(1, stone);
     setConditionValueRange(2, stone);
@@ -169,7 +169,7 @@ function getSelectedConditionValue(index) {
 }
 
 function clampConditionValues() {
-    var stone = getSelectListValue("stone");
+    var stone = getSelectedStone();
 
     clampConditionValue(1, stone);
     clampConditionValue(2, stone);
