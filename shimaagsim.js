@@ -26,6 +26,18 @@ Settings.running = false;
 Settings.abort = false;
 
 window.onload = function () {
+    onLoadItems();
+}
+
+function onLoadItems() {
+    var list = [];
+    for (var name in Items) {
+        var item = Items[name];
+        var displayName = item.listName ? item.listName : item.displayName;
+        list.push({ value: name, text: displayName });
+    }
+    setSelectList("item", list);
+
     onChangeItem();
 }
 
@@ -907,6 +919,7 @@ Herculean.types.magic.cond5 =
 
 var Grioavolr = {};
 Grioavolr.displayName = "グリオアヴァール";
+Grioavolr.listName = "グリオアヴァール（仮）";
 Grioavolr.types = {};
 
 Grioavolr.types.magic = {};
@@ -983,6 +996,7 @@ Grioavolr.types.magic.cond5 =
 
 var Colada = {};
 Colada.displayName = "コラーダ";
+Colada.listName = "コラーダ（仮）";
 Colada.types = {};
 
 Colada.types.melee = {};
