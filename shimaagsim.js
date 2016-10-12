@@ -509,11 +509,6 @@ function addPropValue(ag, slot, value) {
             ag[name] = value;
         else
             ag[name] += value;
-
-        if (slot.totalMax) {
-            if (ag[name] > slot.totalMax)
-                ag[name] = slot.totalMax;
-        }
     }
 }
 
@@ -529,6 +524,29 @@ function addProp(ag, slot, stone) {
         value = randomValueFlat(slot.min, slot.max + bonus);
 
     addPropValue(ag, slot, value);
+}
+
+function clampProps(ag, conds) {
+    if (!conds) return;
+
+    for (var i = 0; i < conds.length; i++) {
+        var cond = conds[i];
+
+        if (hasProps(ag, cond.props)) {
+            for (var j = 0; j < cond.props.length; j++) {
+                var name = cond.props[j];
+                if (ag[name] > cond.max)
+                    ag[name] = cond.max;
+            }
+            break;
+        }
+    }
+}
+
+function hasProps(ag, names) {
+    return names.every(function (name) {
+        return ag[name];
+    });
 }
 
 function createAG(type, stone) {
@@ -560,6 +578,8 @@ function createArmorAG(type, stone) {
 
     addProp(ag, randomChoice(type.slot4), stone);
     addProp(ag, randomChoice(type.slot5), stone);
+
+    clampProps(ag, type.clampConds);
 
     return ag;
 }
@@ -630,6 +650,11 @@ Merlinic.types = {};
 Merlinic.types.magic = {};
 Merlinic.types.magic.displayName = "魔法";
 Merlinic.types.magic.type = "armor";
+Merlinic.types.magic.clampConds = [
+    { props: ["魔攻+", "魔命+"], max: 40 },
+    { props: ["魔命+"], max: 30 },
+    { props: ["魔攻+"], max: 30 },
+];
 Merlinic.types.magic.slot1f = [
     {
         weight: 90, random: [
@@ -697,11 +722,11 @@ Merlinic.types.magic.slot3 = [
     { weight: 40 },
 ];
 Merlinic.types.magic.slot4 = [
-    { weight: 40, props: ["魔命+"], min: 1, max: 15, totalMax: 40 },
+    { weight: 40, props: ["魔命+"], min: 1, max: 15 },
     { weight: 60 },
 ];
 Merlinic.types.magic.slot5 = [
-    { weight: 40, props: ["魔攻+"], min: 1, max: 15, totalMax: 40 },
+    { weight: 40, props: ["魔攻+"], min: 1, max: 15 },
     { weight: 60 },
 ];
 Merlinic.types.magic.cond1 = [
@@ -728,6 +753,11 @@ Herculean.types = {};
 Herculean.types.melee = {};
 Herculean.types.melee.displayName = "近接";
 Herculean.types.melee.type = "armor";
+Herculean.types.melee.clampConds = [
+    { props: ["命中+", "攻+"], max: 40 },
+    { props: ["命中+"], max: 30 },
+    { props: ["攻+"], max: 30 },
+];
 Herculean.types.melee.slot1f = [
     {
         weight: 90, random: [
@@ -796,11 +826,11 @@ Herculean.types.melee.slot3 = [
     { weight: 40 },
 ];
 Herculean.types.melee.slot4 = [
-    { weight: 40, props: ["命中+"], min: 1, max: 15, totalMax: 40 },
+    { weight: 40, props: ["命中+"], min: 1, max: 15 },
     { weight: 60 },
 ];
 Herculean.types.melee.slot5 = [
-    { weight: 40, props: ["攻+"], min: 1, max: 15, totalMax: 40 },
+    { weight: 40, props: ["攻+"], min: 1, max: 15 },
     { weight: 60 },
 ];
 Herculean.types.melee.cond1 = [
@@ -823,6 +853,11 @@ Herculean.types.melee.cond5 =
 Herculean.types.magic = {};
 Herculean.types.magic.displayName = "魔法";
 Herculean.types.magic.type = "armor";
+Herculean.types.magic.clampConds = [
+    { props: ["魔攻+", "魔命+"], max: 35 },
+    { props: ["魔命+"], max: 25 },
+    { props: ["魔攻+"], max: 25 },
+];
 Herculean.types.magic.slot1f = [
     {
         weight: 90, random: [
@@ -890,11 +925,11 @@ Herculean.types.magic.slot3 = [
     { weight: 40 },
 ];
 Herculean.types.magic.slot4 = [
-    { weight: 40, props: ["魔命+"], min: 1, max: 15, totalMax: 35 },
+    { weight: 40, props: ["魔命+"], min: 1, max: 15 },
     { weight: 60 },
 ];
 Herculean.types.magic.slot5 = [
-    { weight: 40, props: ["魔攻+"], min: 1, max: 15, totalMax: 35 },
+    { weight: 40, props: ["魔攻+"], min: 1, max: 15 },
     { weight: 60 },
 ];
 Herculean.types.magic.cond1 = [
