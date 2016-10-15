@@ -1153,8 +1153,8 @@ Colada.types.melee.slot1f = [
             { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["ウェポンスキルのダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["ストアTP+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["魔命+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["魔攻+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN, dist: "slope" },
+            { weight: 1, props: ["魔命+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN },
+            { weight: 1, props: ["魔攻+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN },
             { weight: 1, props: ["敵対心+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
             { weight: 1, props: ["ヘイスト+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
         ]
