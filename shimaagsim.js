@@ -471,10 +471,7 @@ function randomChoice(list) {
             break;
     }
 
-    if (item.random)
-        return randomChoice(item.random);
-    else
-        return item;
+    return item;
 }
 
 // 1-10: 10=10% 9=10% 8=10% ... 1=10%
@@ -515,23 +512,28 @@ function addPropValue(ag, slot, value) {
     }
 }
 
-function addProp(ag, slotList, stone) {
-    var slot = randomChoice(slotList);
+function addProp(ag, slot, stone) {
+    var bonus = (slot.bonus && slot.stone == stone) ? slot.bonus : 0;
 
-    if (slot.props) {
-        var bonus = (slot.bonus && slot.stone == stone) ? slot.bonus : 0;
-        var value;
-        if (slot.dist == "slope")
-            value = randomValueSlope(slot.min, slot.max + bonus, 3, 100);
-        else
-            value = randomValueFlat(slot.min, slot.max + bonus);
+    var value;
+    if (slot.dist == "slope")
+        value = randomValueSlope(slot.min, slot.max + bonus, 3, 100);
+    else
+        value = randomValueFlat(slot.min, slot.max + bonus);
 
-        addPropValue(ag, slot, value);
-    }
+    addPropValue(ag, slot, value);
+}
+
+function applySlot(ag, slot, stone) {
+    if (slot.random)
+        applySlot(ag, randomChoice(slot.random), stone);
+
+    if (slot.props)
+        addProp(ag, slot, stone);
 
     if (slot.extend) {
         for (var i = 0; i < slot.extend.length; i++)
-            addProp(ag, slot.extend[i], stone);
+            applySlot(ag, slot.extend[i], stone);
     }
 }
 
@@ -548,19 +550,19 @@ function createArmorAG(type, stone) {
     var ag = {};
 
     if (stone == Stone.WHITE)
-        addProp(ag, type.slot1f, stone);
+        applySlot(ag, type.slot1f, stone);
     else
-        addProp(ag, type.slot1, stone);
+        applySlot(ag, type.slot1, stone);
 
     if (stone == Stone.GREEN)
-        addProp(ag, type.slot2f, stone);
+        applySlot(ag, type.slot2f, stone);
     else
-        addProp(ag, type.slot2, stone);
+        applySlot(ag, type.slot2, stone);
 
     if (stone == Stone.BLACK)
-        addProp(ag, type.slot3f, stone);
+        applySlot(ag, type.slot3f, stone);
     else
-        addProp(ag, type.slot3, stone);
+        applySlot(ag, type.slot3, stone);
 
     return ag;
 }
@@ -569,45 +571,51 @@ function createWearponAG(type, stone) {
     var ag = {};
 
     if (stone == Stone.GREEN)
-        addProp(ag, type.slot1f, stone);
+        applySlot(ag, type.slot1f, stone);
     else
-        addProp(ag, type.slot1, stone);
+        applySlot(ag, type.slot1, stone);
 
     if (stone == Stone.BLACK)
-        addProp(ag, type.slot2f, stone);
+        applySlot(ag, type.slot2f, stone);
     else
-        addProp(ag, type.slot2, stone);
+        applySlot(ag, type.slot2, stone);
 
-    addProp(ag, type.slot3, stone);
-    addProp(ag, type.slot4, stone);
-    addProp(ag, type.slot5, stone);
+    applySlot(ag, type.slot3, stone);
+    applySlot(ag, type.slot4, stone);
+    applySlot(ag, type.slot5, stone);
 
     return ag;
 }
 
-function createConditions(slots) {
+function createConditions(slot) {
     var conds = [];
-    for (var i = 0; i < slots.length; i++) {
-        var slot = slots[i];
-        if (slot.random)
-            conds = conds.concat(createConditions(slot.random));
-        else if (slot.props && slot.props.length == 1) {
-            conds.push({
-                name: slot.props[0],
-                value: Math.floor((slot.max - slot.min + 1) / 2) + slot.min - 1,
-                min: slot.min,
-                max: slot.max,
-                bonus: slot.bonus,
-                stone: slot.stone
-            });
-        }
+
+    if (slot.props && slot.props.length == 1) {
+        conds.push({
+            name: slot.props[0],
+            value: Math.floor((slot.max - slot.min + 1) / 2) + slot.min - 1,
+            min: slot.min,
+            max: slot.max,
+            bonus: slot.bonus,
+            stone: slot.stone
+        });
+    }
+
+    if (slot.random) {
+        for (var i = 0; i < slot.random.length; i++)
+            conds = conds.concat(createConditions(slot.random[i]));
+    }
+
+    if (slot.extend) {
+        for (var i = 0; i < slot.extend.length; i++)
+            conds = conds.concat(createConditions(slot.extend[i]));
     }
 
     return conds;
 }
 
-function createConditionsWithNone(slots) {
-    var conds = createConditions(slots);
+function createConditionsWithNone(slot) {
+    var conds = createConditions(slot);
     conds.push({ name: "なし", value: 0, min: 0, max: 0 });
     return conds;
 }
@@ -631,129 +639,153 @@ Merlinic.types = {};
 Merlinic.types.magic = {};
 Merlinic.types.magic.displayName = "魔法";
 Merlinic.types.magic.type = "armor";
-Merlinic.types.magic.slot4 = [
-    { weight: 40, props: ["魔命+"], min: 1, max: 15 },
-    { weight: 60 },
-];
-Merlinic.types.magic.slot4h = [
-    { weight: 50, props: ["魔命+"], min: 1, max: 15 },
-    { weight: 50 },
-];
-Merlinic.types.magic.slot4a = [
-    { weight: 100, props: ["魔命+"], min: 0, max: 15 },
-];
-Merlinic.types.magic.slot5 = [
-    { weight: 40, props: ["魔攻+"], min: 1, max: 15 },
-    { weight: 60 },
-];
-Merlinic.types.magic.slot5h = [
-    { weight: 50, props: ["魔攻+"], min: 1, max: 15 },
-    { weight: 50 },
-];
-Merlinic.types.magic.slot5a = [
-    { weight: 100, props: ["魔攻+"], min: 0, max: 15 },
-];
-Merlinic.types.magic.slot1f = [
-    {
-        weight: 90, random: [
-            {
-                weight: 40, props: ["魔命+"], min: 1, max: 30, extend: [
-                    Merlinic.types.magic.slot5h,
-                ]
-            },
-            {
-                weight: 40, props: ["魔攻+"], min: 1, max: 30, extend: [
-                    Merlinic.types.magic.slot4h,
-                ]
-            },
-            {
-                weight: 20, props: ["魔攻+", "魔命+"], min: 1, max: 25, extend: [
-                    Merlinic.types.magic.slot4a,
-                    Merlinic.types.magic.slot5a,
-                ]
-            },
-        ]
-    },
-    {
-        weight: 10, random: [
-            {
-                weight: 40, props: ["命中+"], min: 1, max: 30, extend: [
-                    Merlinic.types.magic.slot4h,
-                    Merlinic.types.magic.slot5h,
-                ]
-            },
-            {
-                weight: 40, props: ["攻+"], min: 1, max: 30, extend: [
-                    Merlinic.types.magic.slot4h,
-                    Merlinic.types.magic.slot5h,
-                ]
-            },
-            {
-                weight: 20, props: ["命中+", "攻+"], min: 1, max: 25, extend: [
-                    Merlinic.types.magic.slot4h,
-                    Merlinic.types.magic.slot5h,
-                ]
-            },
-        ]
-    },
-];
-Merlinic.types.magic.slot1 = [
-    {
-        weight: 60, random: Merlinic.types.magic.slot1f
-    },
-    {
-        weight: 40, extend: [
-            Merlinic.types.magic.slot4,
-            Merlinic.types.magic.slot5,
-        ]
-    },
-];
-Merlinic.types.magic.slot2f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
-            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
-            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
-        ]
-    },
-];
-Merlinic.types.magic.slot2 = [
-    { weight: 60, random: Merlinic.types.magic.slot2f },
-    { weight: 40 },
-];
-Merlinic.types.magic.slot3f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-];
-Merlinic.types.magic.slot3 = [
-    { weight: 60, random: Merlinic.types.magic.slot3f },
-    { weight: 40 },
-];
+Merlinic.types.magic.slot4 = {
+    random: [
+        { weight: 40, props: ["魔命+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Merlinic.types.magic.slot4h = {
+    random: [
+        { weight: 50, props: ["魔命+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Merlinic.types.magic.slot4a = {
+    random: [
+        { weight: 100, props: ["魔命+"], min: 0, max: 15 },
+    ]
+};
+Merlinic.types.magic.slot5 = {
+    random: [
+        { weight: 40, props: ["魔攻+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+}
+Merlinic.types.magic.slot5h = {
+    random: [
+        { weight: 50, props: ["魔攻+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Merlinic.types.magic.slot5a = {
+    random: [
+        { weight: 100, props: ["魔攻+"], min: 0, max: 15 },
+    ]
+};
+Merlinic.types.magic.slot1f = {
+    random: [
+        {
+            weight: 90, random: [
+                {
+                    weight: 40, props: ["魔命+"], min: 1, max: 30, extend: [
+                        Merlinic.types.magic.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["魔攻+"], min: 1, max: 30, extend: [
+                        Merlinic.types.magic.slot4h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["魔攻+", "魔命+"], min: 1, max: 25, extend: [
+                        Merlinic.types.magic.slot4a,
+                        Merlinic.types.magic.slot5a,
+                    ]
+                },
+            ]
+        },
+        {
+            weight: 10, random: [
+                {
+                    weight: 40, props: ["命中+"], min: 1, max: 30, extend: [
+                        Merlinic.types.magic.slot4h,
+                        Merlinic.types.magic.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["攻+"], min: 1, max: 30, extend: [
+                        Merlinic.types.magic.slot4h,
+                        Merlinic.types.magic.slot5h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["命中+", "攻+"], min: 1, max: 25, extend: [
+                        Merlinic.types.magic.slot4h,
+                        Merlinic.types.magic.slot5h,
+                    ]
+                },
+            ]
+        },
+    ]
+};
+Merlinic.types.magic.slot1 = {
+    random: [
+        {
+            weight: 60, extend: [Merlinic.types.magic.slot1f]
+        },
+        {
+            weight: 40, extend: [
+                Merlinic.types.magic.slot4,
+                Merlinic.types.magic.slot5,
+            ]
+        },
+    ]
+};
+Merlinic.types.magic.slot2f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["魔法ダメージ+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["コンサーブMP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ドレインとアスピル吸収量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
+            ]
+        },
+    ]
+};
+Merlinic.types.magic.slot2 = {
+    random: [
+        { weight: 60, extend: [Merlinic.types.magic.slot2f] },
+        { weight: 40 },
+    ]
+};
+Merlinic.types.magic.slot3f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+    ]
+};
+Merlinic.types.magic.slot3 = {
+    random: [
+        { weight: 60, extend: [Merlinic.types.magic.slot3f] },
+        { weight: 40 },
+    ]
+};
 Merlinic.types.magic.cond1 = [
     { name: "魔命+", value: 20, min: 1, max: 40 },
     { name: "命中+", value: 20, min: 1, max: 30 },
@@ -778,130 +810,154 @@ Herculean.types = {};
 Herculean.types.melee = {};
 Herculean.types.melee.displayName = "近接";
 Herculean.types.melee.type = "armor";
-Herculean.types.melee.slot4 = [
-    { weight: 40, props: ["命中+"], min: 1, max: 15 },
-    { weight: 60 },
-];
-Herculean.types.melee.slot4h = [
-    { weight: 50, props: ["命中+"], min: 1, max: 15 },
-    { weight: 50 },
-];
-Herculean.types.melee.slot4a = [
-    { weight: 100, props: ["命中+"], min: 0, max: 15 },
-];
-Herculean.types.melee.slot5 = [
-    { weight: 40, props: ["攻+"], min: 1, max: 15 },
-    { weight: 60 },
-];
-Herculean.types.melee.slot5h = [
-    { weight: 50, props: ["攻+"], min: 1, max: 15 },
-    { weight: 50 },
-];
-Herculean.types.melee.slot5a = [
-    { weight: 100, props: ["攻+"], min: 0, max: 15 },
-];
-Herculean.types.melee.slot1f = [
-    {
-        weight: 90, random: [
-            {
-                weight: 40, props: ["命中+"], min: 1, max: 30, extend: [
-                    Herculean.types.melee.slot5h,
-                ]
-            },
-            {
-                weight: 40, props: ["攻+"], min: 1, max: 30, extend: [
-                    Herculean.types.melee.slot4h,
-                ]
-            },
-            {
-                weight: 20, props: ["命中+", "攻+"], min: 1, max: 25, extend: [
-                    Herculean.types.melee.slot4a,
-                    Herculean.types.melee.slot5a,
-                ]
-            },
-        ]
-    },
-    {
-        weight: 10, random: [
-            {
-                weight: 40, props: ["飛命+"], min: 1, max: 25, extend: [
-                    Herculean.types.melee.slot4h,
-                    Herculean.types.melee.slot5h,
-                ]
-            },
-            {
-                weight: 40, props: ["飛攻+"], min: 1, max: 25, extend: [
-                    Herculean.types.melee.slot4h,
-                    Herculean.types.melee.slot5h,
-                ]
-            },
-            {
-                weight: 20, props: ["飛命+", "飛攻+"], min: 1, max: 20, extend: [
-                    Herculean.types.melee.slot4h,
-                    Herculean.types.melee.slot5h,
-                ]
-            },
-        ]
-    },
-];
-Herculean.types.melee.slot1 = [
-    {
-        weight: 60, random: Herculean.types.melee.slot1f
-    },
-    {
-        weight: 40, extend: [
-            Herculean.types.melee.slot4,
-            Herculean.types.melee.slot5,
-        ]
-    },
-];
-Herculean.types.melee.slot2f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["二刀流+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ワルツ回復量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["カウンター+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
-            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
-            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
-        ]
-    },
-];
-Herculean.types.melee.slot2 = [
-    { weight: 60, random: Herculean.types.melee.slot2f },
-    { weight: 40 },
-];
-Herculean.types.melee.slot3f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-];
-Herculean.types.melee.slot3 = [
-    { weight: 60, random: Herculean.types.melee.slot3f },
-    { weight: 40 },
-];
+Herculean.types.melee.slot4 = {
+    random: [
+        { weight: 40, props: ["命中+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Herculean.types.melee.slot4h = {
+    random: [
+        { weight: 50, props: ["命中+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Herculean.types.melee.slot4a = {
+    random: [
+        { weight: 100, props: ["命中+"], min: 0, max: 15 },
+    ]
+};
+Herculean.types.melee.slot5 = {
+    random: [
+        { weight: 40, props: ["攻+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Herculean.types.melee.slot5h = {
+    random: [
+        { weight: 50, props: ["攻+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Herculean.types.melee.slot5a = {
+    random: [
+        { weight: 100, props: ["攻+"], min: 0, max: 15 },
+    ]
+};
+Herculean.types.melee.slot1f = {
+    random: [
+        {
+            weight: 90, random: [
+                {
+                    weight: 40, props: ["命中+"], min: 1, max: 30, extend: [
+                        Herculean.types.melee.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["攻+"], min: 1, max: 30, extend: [
+                        Herculean.types.melee.slot4h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["命中+", "攻+"], min: 1, max: 25, extend: [
+                        Herculean.types.melee.slot4a,
+                        Herculean.types.melee.slot5a,
+                    ]
+                },
+            ]
+        },
+        {
+            weight: 10, random: [
+                {
+                    weight: 40, props: ["飛命+"], min: 1, max: 25, extend: [
+                        Herculean.types.melee.slot4h,
+                        Herculean.types.melee.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["飛攻+"], min: 1, max: 25, extend: [
+                        Herculean.types.melee.slot4h,
+                        Herculean.types.melee.slot5h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["飛命+", "飛攻+"], min: 1, max: 20, extend: [
+                        Herculean.types.melee.slot4h,
+                        Herculean.types.melee.slot5h,
+                    ]
+                },
+            ]
+        },
+    ]
+};
+Herculean.types.melee.slot1 = {
+    random: [
+        {
+            weight: 60, extend: [Herculean.types.melee.slot1f]
+        },
+        {
+            weight: 40, extend: [
+              Herculean.types.melee.slot4,
+              Herculean.types.melee.slot5,
+            ]
+        },
+    ]
+};
+Herculean.types.melee.slot2f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["二刀流+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ワルツ回復量+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["カウンター+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
+            ]
+        },
+    ]
+};
+Herculean.types.melee.slot2 = {
+    random: [
+        { weight: 60, extend: [Herculean.types.melee.slot2f] },
+        { weight: 40 },
+    ]
+};
+Herculean.types.melee.slot3f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+    ]
+};
+Herculean.types.melee.slot3 = {
+    random: [
+        { weight: 60, extend: [Herculean.types.melee.slot3f] },
+        { weight: 40 },
+    ]
+};
 Herculean.types.melee.cond1 = [
     { name: "命中+", value: 20, min: 1, max: 40 },
     { name: "飛命+", value: 20, min: 1, max: 25 },
@@ -922,129 +978,153 @@ Herculean.types.melee.cond5 =
 Herculean.types.magic = {};
 Herculean.types.magic.displayName = "魔法";
 Herculean.types.magic.type = "armor";
-Herculean.types.magic.slot4 = [
-    { weight: 40, props: ["魔命+"], min: 1, max: 15 },
-    { weight: 60 },
-];
-Herculean.types.magic.slot4h = [
-    { weight: 50, props: ["魔命+"], min: 1, max: 15 },
-    { weight: 50 },
-];
-Herculean.types.magic.slot4a = [
-    { weight: 100, props: ["魔命+"], min: 0, max: 15 },
-];
-Herculean.types.magic.slot5 = [
-    { weight: 40, props: ["魔攻+"], min: 1, max: 15 },
-    { weight: 60 },
-];
-Herculean.types.magic.slot5h = [
-    { weight: 50, props: ["魔攻+"], min: 1, max: 15 },
-    { weight: 50 },
-];
-Herculean.types.magic.slot5a = [
-    { weight: 100, props: ["魔攻+"], min: 0, max: 15 },
-];
-Herculean.types.magic.slot1f = [
-    {
-        weight: 90, random: [
-            {
-                weight: 40, props: ["魔命+"], min: 1, max: 25, extend: [
-                    Herculean.types.magic.slot5h,
-                ]
-            },
-            {
-                weight: 40, props: ["魔攻+"], min: 1, max: 25, extend: [
-                    Herculean.types.magic.slot4h,
-                ]
-            },
-            {
-                weight: 20, props: ["魔攻+", "魔命+"], min: 1, max: 20, extend: [
-                    Herculean.types.magic.slot4a,
-                    Herculean.types.magic.slot5a,
-                ]
-            },
-        ]
-    },
-    {
-        weight: 10, random: [
-            {
-                weight: 40, props: ["命中+"], min: 1, max: 25, extend: [
-                    Herculean.types.magic.slot4h,
-                    Herculean.types.magic.slot5h,
-                ]
-            },
-            {
-                weight: 40, props: ["攻+"], min: 1, max: 25, extend: [
-                    Herculean.types.magic.slot4h,
-                    Herculean.types.magic.slot5h,
-                ]
-            },
-            {
-                weight: 20, props: ["命中+", "攻+"], min: 1, max: 20, extend: [
-                    Herculean.types.magic.slot4h,
-                    Herculean.types.magic.slot5h,
-                ]
-            },
-        ]
-    },
-];
-Herculean.types.magic.slot1 = [
-    {
-        weight: 60, random: Herculean.types.magic.slot1f
-    },
-    {
-        weight: 40, extend: [
-            Herculean.types.magic.slot4,
-            Herculean.types.magic.slot5,
-        ]
-    },
-];
-Herculean.types.magic.slot2f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
-            { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
-            { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
-        ]
-    },
-];
-Herculean.types.magic.slot2 = [
-    { weight: 60, random: Herculean.types.magic.slot2f },
-    { weight: 40 },
-];
-Herculean.types.magic.slot3f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-];
-Herculean.types.magic.slot3 = [
-    { weight: 60, random: Herculean.types.magic.slot3f },
-    { weight: 40 },
-];
+Herculean.types.magic.slot4 = {
+    random: [
+        { weight: 40, props: ["魔命+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Herculean.types.magic.slot4h = {
+    random: [
+        { weight: 50, props: ["魔命+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Herculean.types.magic.slot4a = {
+    random: [
+        { weight: 100, props: ["魔命+"], min: 0, max: 15 },
+    ]
+};
+Herculean.types.magic.slot5 = {
+    random: [
+        { weight: 40, props: ["魔攻+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Herculean.types.magic.slot5h = {
+    random: [
+        { weight: 50, props: ["魔攻+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Herculean.types.magic.slot5a = {
+    random: [
+        { weight: 100, props: ["魔攻+"], min: 0, max: 15 },
+    ]
+};
+Herculean.types.magic.slot1f = {
+    random: [
+        {
+            weight: 90, random: [
+                {
+                    weight: 40, props: ["魔命+"], min: 1, max: 25, extend: [
+                        Herculean.types.magic.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["魔攻+"], min: 1, max: 25, extend: [
+                        Herculean.types.magic.slot4h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["魔攻+", "魔命+"], min: 1, max: 20, extend: [
+                        Herculean.types.magic.slot4a,
+                        Herculean.types.magic.slot5a,
+                    ]
+                },
+            ]
+        },
+        {
+            weight: 10, random: [
+                {
+                    weight: 40, props: ["命中+"], min: 1, max: 25, extend: [
+                        Herculean.types.magic.slot4h,
+                        Herculean.types.magic.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["攻+"], min: 1, max: 25, extend: [
+                        Herculean.types.magic.slot4h,
+                        Herculean.types.magic.slot5h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["命中+", "攻+"], min: 1, max: 20, extend: [
+                        Herculean.types.magic.slot4h,
+                        Herculean.types.magic.slot5h,
+                    ]
+                },
+            ]
+        },
+    ]
+};
+Herculean.types.magic.slot1 = {
+    random: [
+        {
+            weight: 60, extend: [Herculean.types.magic.slot1f]
+        },
+        {
+            weight: 40, extend: [
+                Herculean.types.magic.slot4,
+                Herculean.types.magic.slot5,
+            ]
+        },
+    ]
+};
+Herculean.types.magic.slot2f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ファストキャスト+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["敵対心-"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
+            ]
+        },
+    ]
+};
+Herculean.types.magic.slot2 = {
+    random: [
+        { weight: 60, extend: [Herculean.types.magic.slot2f] },
+        { weight: 40 },
+    ]
+};
+Herculean.types.magic.slot3f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+    ]
+};
+Herculean.types.magic.slot3 = {
+    random: [
+        { weight: 60, extend: [Herculean.types.magic.slot3f] },
+        { weight: 40 },
+    ]
+};
 Herculean.types.magic.cond1 = [
     { name: "魔命+", value: 20, min: 1, max: 35 },
     { name: "命中+", value: 20, min: 1, max: 25 },
@@ -1070,63 +1150,77 @@ Grioavolr.types = {};
 Grioavolr.types.magic = {};
 Grioavolr.types.magic.displayName = "魔法";
 Grioavolr.types.magic.type = "weapon";
-Grioavolr.types.magic.slot1f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 8, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["強化魔法時間+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["弱体魔法スキル+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["詠唱中断率-"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["コンサーブMP+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-];
-Grioavolr.types.magic.slot1 = [
-    { weight: 60, random: Grioavolr.types.magic.slot1f },
-    { weight: 40 },
-];
-Grioavolr.types.magic.slot2f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["INT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MND+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["CHR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MP+"], min: 1, max: 110, bonus: 10, stone: Stone.BLACK },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["DEX+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["VIT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["AGI+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-];
-Grioavolr.types.magic.slot2 = [
-    { weight: 60, random: Grioavolr.types.magic.slot2f },
-    { weight: 40 },
-];
-Grioavolr.types.magic.slot3 = [
-    { weight: 60, props: ["魔命+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
-    { weight: 40 },
-];
-Grioavolr.types.magic.slot4 = [
-    { weight: 60, props: ["魔攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
-    { weight: 40 },
-];
-Grioavolr.types.magic.slot5 = [
-    { weight: 60, props: ["魔法ダメージ+"], min: 1, max: 10 },
-    { weight: 40 },
-];
+Grioavolr.types.magic.slot1f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["マジックバーストダメージ+"], min: 1, max: 8, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ファストキャスト+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["強化魔法時間+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["弱体魔法スキル+"], min: 1, max: 15, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["マジックアキュメン+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["詠唱中断率-"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["コンサーブMP+"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["魔法クリティカルヒットダメージ+"], min: 1, max: 9, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+    ]
+};
+Grioavolr.types.magic.slot1 = {
+    random: [
+        { weight: 60, extend: [Grioavolr.types.magic.slot1f] },
+        { weight: 40 },
+    ]
+};
+Grioavolr.types.magic.slot2f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["INT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MND+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["CHR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MP+"], min: 1, max: 110, bonus: 10, stone: Stone.BLACK },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["STR+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["DEX+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["VIT+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["AGI+"], min: 1, max: 15, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+    ]
+};
+Grioavolr.types.magic.slot2 = {
+    random: [
+        { weight: 60, extend: [Grioavolr.types.magic.slot2f] },
+        { weight: 40 },
+    ]
+};
+Grioavolr.types.magic.slot3 = {
+    random: [
+        { weight: 60, props: ["魔命+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+        { weight: 40 },
+    ]
+};
+Grioavolr.types.magic.slot4 = {
+    random: [
+        { weight: 60, props: ["魔攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+        { weight: 40 },
+    ]
+};
+Grioavolr.types.magic.slot5 = {
+    random: [
+        { weight: 60, props: ["魔法ダメージ+"], min: 1, max: 10 },
+        { weight: 40 },
+    ]
+};
 Grioavolr.types.magic.cond1 =
     createConditionsWithNone(Grioavolr.types.magic.slot3);
 Grioavolr.types.magic.cond2 =
@@ -1146,62 +1240,76 @@ Colada.types = {};
 Colada.types.melee = {};
 Colada.types.melee.displayName = "近接";
 Colada.types.melee.type = "weapon";
-Colada.types.melee.slot1f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["ダブルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ウェポンスキルのダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ストアTP+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["魔命+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN },
-            { weight: 1, props: ["魔攻+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN },
-            { weight: 1, props: ["敵対心+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-            { weight: 1, props: ["ヘイスト+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["被物理ダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-        ]
-    },
-];
-Colada.types.melee.slot1 = [
-    { weight: 60, random: Colada.types.melee.slot1f },
-    { weight: 40 },
-];
-Colada.types.melee.slot2f = [
-    {
-        weight: 90, random: [
-            { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-    {
-        weight: 10, random: [
-            { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-            { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
-        ]
-    },
-];
-Colada.types.melee.slot2 = [
-    { weight: 60, random: Colada.types.melee.slot2f },
-    { weight: 40 },
-];
-Colada.types.melee.slot3 = [
-    { weight: 60, props: ["命中+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
-    { weight: 40 },
-];
-Colada.types.melee.slot4 = [
-    { weight: 60, props: ["攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
-    { weight: 40 },
-];
-Colada.types.melee.slot5 = [
-    { weight: 60, props: ["D+"], min: 1, max: 20 },
-    { weight: 40 },
-];
+Colada.types.melee.slot1f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["ダブルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ウェポンスキルのダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ストアTP+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["魔命+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN },
+                { weight: 1, props: ["魔攻+"], min: 1, max: 15, bonus: 5, stone: Stone.GREEN },
+                { weight: 1, props: ["敵対心+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ヘイスト+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["被物理ダメージ+"], min: 1, max: 2, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+    ]
+};
+Colada.types.melee.slot1 = {
+    random: [
+        { weight: 60, extend: [Colada.types.melee.slot1f] },
+        { weight: 40 },
+    ]
+};
+Colada.types.melee.slot2f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+    ]
+};
+Colada.types.melee.slot2 = {
+    random: [
+        { weight: 60, extend: [Colada.types.melee.slot2f] },
+        { weight: 40 },
+    ]
+};
+Colada.types.melee.slot3 = {
+    random: [
+        { weight: 60, props: ["命中+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+        { weight: 40 },
+    ]
+};
+Colada.types.melee.slot4 = {
+    random: [
+        { weight: 60, props: ["攻+"], min: 1, max: 25, bonus: 5, stone: Stone.WHITE },
+        { weight: 40 },
+    ]
+};
+Colada.types.melee.slot5 = {
+    random: [
+        { weight: 60, props: ["D+"], min: 1, max: 20 },
+        { weight: 40 },
+    ]
+};
 Colada.types.melee.cond1 =
     createConditionsWithNone(Colada.types.melee.slot3);
 Colada.types.melee.cond2 =
