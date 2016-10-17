@@ -69,19 +69,19 @@ Herculean.types.melee.slot1f = {
         {
             weight: 10, random: [
                 {
-                    weight: 40, props: ["飛命+"], min: 1, max: 25, extend: [
+                    weight: 40, props: ["飛命+"], min: 1, max: 30, extend: [
                         Herculean.types.melee.slot4,
                         Herculean.types.melee.slot5,
                     ]
                 },
                 {
-                    weight: 40, props: ["飛攻+"], min: 1, max: 25, extend: [
+                    weight: 40, props: ["飛攻+"], min: 1, max: 30, extend: [
                         Herculean.types.melee.slot4,
                         Herculean.types.melee.slot5,
                     ]
                 },
                 {
-                    weight: 20, props: ["飛命+", "飛攻+"], min: 1, max: 20, extend: [
+                    weight: 20, props: ["飛命+", "飛攻+"], min: 1, max: 25, extend: [
                         Herculean.types.melee.slot4,
                         Herculean.types.melee.slot5,
                     ]
@@ -108,7 +108,6 @@ Herculean.types.melee.slot2f = {
         {
             weight: 90, random: [
                 { weight: 1, props: ["トリプルアタック+"], min: 1, max: 3, bonus: 1, stone: Stone.GREEN, dist: "slope" },
-                { weight: 1, props: ["ダブルアタック+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
                 { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
                 { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
                 { weight: 1, props: ["ストアTP+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
@@ -120,9 +119,9 @@ Herculean.types.melee.slot2f = {
         },
         {
             weight: 10, random: [
-                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
-                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
-                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, dist: "slope" },
             ]
         },
     ]
@@ -160,12 +159,12 @@ Herculean.types.melee.slot3 = {
 };
 Herculean.types.melee.cond1 = [
     { name: "命中+", value: 20, min: 1, max: 40 },
-    { name: "飛命+", value: 20, min: 1, max: 25 },
+    { name: "飛命+", value: 20, min: 1, max: 30 },
     { name: "なし", value: 0, min: 0, max: 0 },
 ];
 Herculean.types.melee.cond2 = [
     { name: "攻+", value: 20, min: 1, max: 40 },
-    { name: "飛攻+", value: 20, min: 1, max: 25 },
+    { name: "飛攻+", value: 20, min: 1, max: 30 },
     { name: "なし", value: 0, min: 0, max: 0 },
 ];
 Herculean.types.melee.cond3 =
@@ -173,6 +172,173 @@ Herculean.types.melee.cond3 =
 Herculean.types.melee.cond4 =
     createConditionsWithNone(Herculean.types.melee.slot3);
 Herculean.types.melee.cond5 =
+    [{ name: "なし", value: 0, min: 0, max: 0 }];
+
+Herculean.types.ranged = {};
+Herculean.types.ranged.displayName = "遠隔";
+Herculean.types.ranged.type = "armor";
+Herculean.types.ranged.slot4 = {
+    random: [
+        { weight: 40, props: ["飛命+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Herculean.types.ranged.slot4h = {
+    random: [
+        { weight: 50, props: ["飛命+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Herculean.types.ranged.slot4a = {
+    random: [
+        { weight: 100, props: ["飛命+"], min: 0, max: 15 },
+    ]
+};
+Herculean.types.ranged.slot5 = {
+    random: [
+        { weight: 40, props: ["飛攻+"], min: 1, max: 15 },
+        { weight: 60 },
+    ]
+};
+Herculean.types.ranged.slot5h = {
+    random: [
+        { weight: 50, props: ["飛攻+"], min: 1, max: 15 },
+        { weight: 50 },
+    ]
+};
+Herculean.types.ranged.slot5a = {
+    random: [
+        { weight: 100, props: ["飛攻+"], min: 0, max: 15 },
+    ]
+};
+Herculean.types.ranged.slot1f = {
+    random: [
+        {
+            weight: 90, random: [
+                {
+                    weight: 40, props: ["飛命+"], min: 1, max: 30, extend: [
+                        Herculean.types.ranged.slot5h,
+                    ]
+                },
+                {
+                    weight: 40, props: ["飛攻+"], min: 1, max: 30, extend: [
+                        Herculean.types.ranged.slot4h,
+                    ]
+                },
+                {
+                    weight: 20, props: ["飛命+", "飛攻+"], min: 1, max: 25, extend: [
+                        Herculean.types.ranged.slot4a,
+                        Herculean.types.ranged.slot5a,
+                    ]
+                },
+            ]
+        },
+        {
+            weight: 10, random: [
+                {
+                    weight: 40, props: ["魔命+"], min: 1, max: 25, extend: [
+                        Herculean.types.ranged.slot4,
+                        Herculean.types.ranged.slot5,
+                    ]
+                },
+                {
+                    weight: 40, props: ["魔攻+"], min: 1, max: 25, extend: [
+                        Herculean.types.ranged.slot4,
+                        Herculean.types.ranged.slot5,
+                    ]
+                },
+                {
+                    weight: 20, props: ["魔命+", "魔攻+"], min: 1, max: 20, extend: [
+                        Herculean.types.ranged.slot4,
+                        Herculean.types.ranged.slot5,
+                    ]
+                },
+            ]
+        },
+    ]
+};
+Herculean.types.ranged.slot1 = {
+    random: [
+        {
+            weight: 60, extend: [Herculean.types.ranged.slot1f]
+        },
+        {
+            weight: 40, extend: [
+              Herculean.types.ranged.slot4,
+              Herculean.types.ranged.slot5,
+            ]
+        },
+    ]
+};
+Herculean.types.ranged.slot2f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["クリティカルヒット+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["クリティカルヒットダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ウェポンスキルダメージ+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["スナップショット+"], min: 1, max: 5, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["ラピッドショット+"], min: 1, max: 6, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["敵対心-"], min: 1, max: 7, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["連携ボーナス+"], min: 1, max: 4, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+                { weight: 1, props: ["モクシャ+"], min: 1, max: 10, bonus: 1, stone: Stone.GREEN, dist: "slope" },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, dist: "slope" },
+            ]
+        },
+    ]
+};
+Herculean.types.ranged.slot2 = {
+    random: [
+        { weight: 60, extend: [Herculean.types.ranged.slot2f] },
+        { weight: 40 },
+    ]
+};
+Herculean.types.ranged.slot3f = {
+    random: [
+        {
+            weight: 90, random: [
+                { weight: 1, props: ["STR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["DEX+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["AGI+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+        {
+            weight: 10, random: [
+                { weight: 1, props: ["VIT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["INT+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["MND+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+                { weight: 1, props: ["CHR+"], min: 1, max: 10, bonus: 5, stone: Stone.BLACK },
+            ]
+        },
+    ]
+};
+Herculean.types.ranged.slot3 = {
+    random: [
+        { weight: 60, extend: [Herculean.types.ranged.slot3f] },
+        { weight: 40 },
+    ]
+};
+Herculean.types.ranged.cond1 = [
+    { name: "飛命+", value: 20, min: 1, max: 40 },
+    { name: "魔命+", value: 20, min: 1, max: 25 },
+    { name: "なし", value: 0, min: 0, max: 0 },
+];
+Herculean.types.ranged.cond2 = [
+    { name: "飛攻+", value: 20, min: 1, max: 40 },
+    { name: "魔攻+", value: 20, min: 1, max: 25 },
+    { name: "なし", value: 0, min: 0, max: 0 },
+];
+Herculean.types.ranged.cond3 =
+    createConditionsWithNone(Herculean.types.ranged.slot2);
+Herculean.types.ranged.cond4 =
+    createConditionsWithNone(Herculean.types.ranged.slot3);
+Herculean.types.ranged.cond5 =
     [{ name: "なし", value: 0, min: 0, max: 0 }];
 
 Herculean.types.magic = {};
@@ -237,19 +403,19 @@ Herculean.types.magic.slot1f = {
         {
             weight: 10, random: [
                 {
-                    weight: 40, props: ["命中+"], min: 1, max: 25, extend: [
+                    weight: 40, props: ["命中+"], min: 1, max: 30, extend: [
                         Herculean.types.magic.slot4,
                         Herculean.types.magic.slot5,
                     ]
                 },
                 {
-                    weight: 40, props: ["攻+"], min: 1, max: 25, extend: [
+                    weight: 40, props: ["攻+"], min: 1, max: 30, extend: [
                         Herculean.types.magic.slot4,
                         Herculean.types.magic.slot5,
                     ]
                 },
                 {
-                    weight: 20, props: ["命中+", "攻+"], min: 1, max: 20, extend: [
+                    weight: 20, props: ["命中+", "攻+"], min: 1, max: 25, extend: [
                         Herculean.types.magic.slot4,
                         Herculean.types.magic.slot5,
                     ]
@@ -287,9 +453,9 @@ Herculean.types.magic.slot2f = {
         },
         {
             weight: 10, random: [
-                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
-                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
-                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, dist: "slope" },
             ]
         },
     ]
@@ -327,12 +493,12 @@ Herculean.types.magic.slot3 = {
 };
 Herculean.types.magic.cond1 = [
     { name: "魔命+", value: 20, min: 1, max: 35 },
-    { name: "命中+", value: 20, min: 1, max: 25 },
+    { name: "命中+", value: 20, min: 1, max: 30 },
     { name: "なし", value: 0, min: 0, max: 0 },
 ];
 Herculean.types.magic.cond2 = [
     { name: "魔攻+", value: 20, min: 1, max: 35 },
-    { name: "攻+", value: 20, min: 1, max: 25 },
+    { name: "攻+", value: 20, min: 1, max: 30 },
     { name: "なし", value: 0, min: 0, max: 0 },
 ];
 Herculean.types.magic.cond3 =

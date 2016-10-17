@@ -6,6 +6,7 @@ https://opensource.org/licenses/MIT
 var Merlinic = {};
 Merlinic.displayName = "マーリン装備";
 Merlinic.types = {};
+
 Merlinic.types.magic = {};
 Merlinic.types.magic.displayName = "魔法";
 Merlinic.types.magic.type = "armor";
@@ -118,9 +119,9 @@ Merlinic.types.magic.slot2f = {
         },
         {
             weight: 10, random: [
-                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5 },
-                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5 },
-                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4 },
+                { weight: 1, props: ["被物理ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被魔法ダメージ-"], min: 1, max: 5, dist: "slope" },
+                { weight: 1, props: ["被ダメージ-"], min: 1, max: 4, dist: "slope" },
             ]
         },
     ]
