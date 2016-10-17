@@ -69,20 +69,20 @@ Merlinic.types.magic.slot1f = {
             weight: 10, random: [
                 {
                     weight: 40, props: ["命中+"], min: 1, max: 30, extend: [
-                        Merlinic.types.magic.slot4h,
-                        Merlinic.types.magic.slot5h,
+                        Merlinic.types.magic.slot4,
+                        Merlinic.types.magic.slot5,
                     ]
                 },
                 {
                     weight: 40, props: ["攻+"], min: 1, max: 30, extend: [
-                        Merlinic.types.magic.slot4h,
-                        Merlinic.types.magic.slot5h,
+                        Merlinic.types.magic.slot4,
+                        Merlinic.types.magic.slot5,
                     ]
                 },
                 {
                     weight: 20, props: ["命中+", "攻+"], min: 1, max: 25, extend: [
-                        Merlinic.types.magic.slot4h,
-                        Merlinic.types.magic.slot5h,
+                        Merlinic.types.magic.slot4,
+                        Merlinic.types.magic.slot5,
                     ]
                 },
             ]

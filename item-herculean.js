@@ -70,20 +70,20 @@ Herculean.types.melee.slot1f = {
             weight: 10, random: [
                 {
                     weight: 40, props: ["飛命+"], min: 1, max: 25, extend: [
-                        Herculean.types.melee.slot4h,
-                        Herculean.types.melee.slot5h,
+                        Herculean.types.melee.slot4,
+                        Herculean.types.melee.slot5,
                     ]
                 },
                 {
                     weight: 40, props: ["飛攻+"], min: 1, max: 25, extend: [
-                        Herculean.types.melee.slot4h,
-                        Herculean.types.melee.slot5h,
+                        Herculean.types.melee.slot4,
+                        Herculean.types.melee.slot5,
                     ]
                 },
                 {
                     weight: 20, props: ["飛命+", "飛攻+"], min: 1, max: 20, extend: [
-                        Herculean.types.melee.slot4h,
-                        Herculean.types.melee.slot5h,
+                        Herculean.types.melee.slot4,
+                        Herculean.types.melee.slot5,
                     ]
                 },
             ]
@@ -238,20 +238,20 @@ Herculean.types.magic.slot1f = {
             weight: 10, random: [
                 {
                     weight: 40, props: ["命中+"], min: 1, max: 25, extend: [
-                        Herculean.types.magic.slot4h,
-                        Herculean.types.magic.slot5h,
+                        Herculean.types.magic.slot4,
+                        Herculean.types.magic.slot5,
                     ]
                 },
                 {
                     weight: 40, props: ["攻+"], min: 1, max: 25, extend: [
-                        Herculean.types.magic.slot4h,
-                        Herculean.types.magic.slot5h,
+                        Herculean.types.magic.slot4,
+                        Herculean.types.magic.slot5,
                     ]
                 },
                 {
                     weight: 20, props: ["命中+", "攻+"], min: 1, max: 20, extend: [
-                        Herculean.types.magic.slot4h,
-                        Herculean.types.magic.slot5h,
+                        Herculean.types.magic.slot4,
+                        Herculean.types.magic.slot5,
                     ]
                 },
             ]
