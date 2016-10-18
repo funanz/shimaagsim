@@ -97,8 +97,8 @@ Chironic.types.melee.slot1 = {
         },
         {
             weight: 40, extend: [
-              Chironic.types.melee.slot4,
-              Chironic.types.melee.slot5,
+                Chironic.types.melee.slot4,
+                Chironic.types.melee.slot5,
             ]
         },
     ]

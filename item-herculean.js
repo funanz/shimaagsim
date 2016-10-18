@@ -97,8 +97,8 @@ Herculean.types.melee.slot1 = {
         },
         {
             weight: 40, extend: [
-              Herculean.types.melee.slot4,
-              Herculean.types.melee.slot5,
+                Herculean.types.melee.slot4,
+                Herculean.types.melee.slot5,
             ]
         },
     ]
@@ -264,8 +264,8 @@ Herculean.types.ranged.slot1 = {
         },
         {
             weight: 40, extend: [
-              Herculean.types.ranged.slot4,
-              Herculean.types.ranged.slot5,
+                Herculean.types.ranged.slot4,
+                Herculean.types.ranged.slot5,
             ]
         },
     ]

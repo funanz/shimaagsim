@@ -98,8 +98,8 @@ Valorous.types.melee.slot1 = {
         },
         {
             weight: 40, extend: [
-              Valorous.types.melee.slot4,
-              Valorous.types.melee.slot5,
+                Valorous.types.melee.slot4,
+                Valorous.types.melee.slot5,
             ]
         },
     ]

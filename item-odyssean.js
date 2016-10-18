@@ -97,8 +97,8 @@ Odyssean.types.melee.slot1 = {
         },
         {
             weight: 40, extend: [
-              Odyssean.types.melee.slot4,
-              Odyssean.types.melee.slot5,
+                Odyssean.types.melee.slot4,
+                Odyssean.types.melee.slot5,
             ]
         },
     ]
