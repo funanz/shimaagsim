@@ -258,7 +258,7 @@ function displayResult(result) {
 
     displayTextArea("message", msg);
 
-    var url = "https://twitter.com/?status=" + encodeURIComponent(msg);
+    var url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(msg);
     displayLink("link", "Twitterに投稿", url);
 }
 
@@ -275,7 +275,7 @@ function displayAbortResult(result) {
 
     displayTextArea("message", msg);
 
-    var url = "https://twitter.com/?status=" + encodeURIComponent(msg);
+    var url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(msg);
     displayLink("link", "Twitterに投稿", url);
 }
 
