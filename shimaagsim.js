@@ -390,9 +390,8 @@ var Random = {};
 Random.mt = (function () {
     var mt = new MT19937ar();
 
-    var keys = [];
-    for (var i = 0; i < 128; i++)
-        keys.push((Math.random() * 4294967296.0) >>> 0);
+    var keys = new Uint32Array(mt.N);
+    self.crypto.getRandomValues(keys);
     mt.init_by_array(keys);
 
     return mt;
